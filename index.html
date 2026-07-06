@@ -39,7 +39,8 @@
     background:var(--main-bg);
     color:var(--text-primary);
     display:flex;
-    min-height:100vh;
+    height:100vh;
+    overflow:hidden;
   }
 
   /* ---------- Sidebar ---------- */
@@ -131,6 +132,7 @@
   /* ---------- Main ---------- */
   .content-area{
     flex:1; min-width:0; position:relative;
+    height:100vh; overflow-y:auto;
     background:
       radial-gradient(760px 620px at 4% -10%, rgba(255,61,122,0.20), transparent 62%),
       radial-gradient(880px 720px at 100% -8%, rgba(46,201,201,0.28), transparent 62%),
@@ -141,7 +143,16 @@
   .main{ flex:1; min-width:0; position:relative; padding:36px 44px; max-width:1440px; margin:0 auto; }
   .page-header{ margin-bottom:26px; }
   .page-eyebrow{ font-size:13px; color:var(--text-muted); margin:0 0 6px 0; font-weight:600; letter-spacing:.3px; }
-  .page-eyebrow.accented{ color:var(--accent); margin-bottom:14px; }
+  .page-eyebrow.accented{
+    display:inline-block;
+    background:#5c6068;
+    color:#fff;
+    padding:4px 12px;
+    border-radius:999px;
+    font-size:12px;
+    letter-spacing:.4px;
+    margin-bottom:14px;
+  }
   .page-title{
     font-size:24px; font-weight:700; margin:0; display:flex; align-items:center; gap:10px;
     color:var(--text-primary);
@@ -162,7 +173,9 @@
   .card:hover{ box-shadow:0 4px 18px rgba(20,23,28,.08); border-color:#d4d7dc; transform:translateY(-1px); }
   .card.disabled{ opacity:.85; }
 
-  .card-top{ display:flex; gap:12px; align-items:flex-start; flex:1; }
+  .card-top{ display:flex; gap:12px; align-items:center; }
+  .card-title{ font-size:17px; font-weight:700; margin:0; color:var(--text-primary); flex:1; min-width:0; }
+  .card-desc{ margin:-4px 0 0 48px; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; flex:1; }
 
   .icon-badge{
     flex-shrink:0; width:36px; height:36px; border-radius:11px;
@@ -175,11 +188,7 @@
   }
   .icon-badge svg{ width:17px; height:17px; display:block; }
 
-  .card-body{ min-width:0; flex:1; }
-  .card-title-row{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:8px; }
-  .card-title{ font-size:15px; font-weight:700; margin:0; color:var(--text-primary); }
   .dev-status{ font-size:10.5px; color:var(--text-muted); white-space:nowrap; flex-shrink:0; padding-top:2px; }
-  .card-desc{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; }
   .card-desc li{ font-size:12.5px; color:var(--text-secondary); line-height:1.5; position:relative; padding-left:10px; }
   .card-desc li::before{ content:"·"; position:absolute; left:0; color:var(--text-muted); }
 
@@ -212,9 +221,177 @@
     background:var(--card-bg); border:1px dashed var(--card-border); border-radius:14px;
     padding:60px 30px; text-align:center; color:var(--text-muted); font-size:14px;
   }
+
+  /* ---------- 우측 하단 문의 플로팅 버튼 ---------- */
+  .feedback-fab{
+    position:fixed; right:28px; bottom:28px; z-index:80;
+    display:flex; align-items:center; gap:8px;
+    padding:13px 20px; border-radius:999px; border:none; cursor:pointer;
+    background:linear-gradient(100deg, #0a2e31 0%, #1c6b76 100%);
+    color:#fff; font-family:inherit; font-size:13px; font-weight:600;
+    box-shadow:0 10px 24px rgba(15,45,50,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .feedback-fab:hover{ transform:translateY(-2px); box-shadow:0 14px 28px rgba(15,45,50,0.4), inset 0 1px 0 rgba(255,255,255,0.25); }
+  .feedback-fab svg{ width:17px; height:17px; flex-shrink:0; }
+
+  .feedback-panel{
+    position:fixed; right:28px; bottom:92px; z-index:80;
+    width:290px;
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px;
+    box-shadow:0 16px 40px rgba(20,23,28,0.18);
+    padding:18px;
+    opacity:0; transform:translateY(8px) scale(.98); pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .feedback-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .feedback-panel-header{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; margin-bottom:4px; }
+  .feedback-panel h3{ margin:0; font-size:14.5px; font-weight:700; color:var(--text-primary); }
+  .feedback-panel .fb-close{ background:none; border:none; color:var(--text-muted); cursor:pointer; font-size:16px; line-height:1; padding:2px; }
+  .feedback-panel p{ margin:2px 0 12px; font-size:12px; color:var(--text-secondary); line-height:1.5; }
+  .feedback-panel textarea{
+    width:100%; min-height:72px; border:1px solid var(--card-border); border-radius:8px;
+    padding:8px 10px; font-size:12.5px; font-family:inherit; resize:vertical; color:var(--text-primary);
+  }
+  .feedback-panel textarea:focus{ outline:none; border-color:var(--accent); }
+  .fb-actions{ display:flex; justify-content:flex-end; gap:8px; margin-top:10px; }
+  .fb-submit{
+    background:var(--accent); color:#fff; border:none; padding:7px 16px; border-radius:8px;
+    font-size:12.5px; font-weight:600; cursor:pointer; font-family:inherit;
+  }
+  .fb-submit:hover{ filter:brightness(1.08); }
+
+  /* ---------- 우측 하단 퀵메뉴 ---------- */
+  .quick-menu{ position:fixed; right:28px; bottom:28px; z-index:80; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
+  .qm-items{
+    display:flex; flex-direction:column; gap:10px; align-items:flex-end;
+    opacity:0; transform:translateY(8px); pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .qm-items.open{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .qm-item{
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:1px solid var(--card-border); color:var(--text-primary);
+    padding:8px 16px 8px 8px; border-radius:999px; font-size:13px; font-weight:600;
+    box-shadow:0 6px 16px rgba(20,23,28,0.12); cursor:pointer; font-family:inherit;
+    white-space:nowrap;
+  }
+  .qm-item:hover{ background:#f5f6f7; }
+  .qm-item .qm-icon{
+    width:26px; height:26px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:#eef0f2; color:var(--text-secondary);
+  }
+  .qm-item .qm-icon svg{ width:14px; height:14px; }
+
+  .qm-fab{
+    width:54px; height:54px; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(150deg, #b8bcc2, #8b9099); color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 18px rgba(60,64,70,0.22), inset 0 1px 0 rgba(255,255,255,0.3);
+    transition:transform .2s ease, box-shadow .15s ease;
+  }
+  .qm-fab:hover{ transform:translateY(-2px); }
+  .qm-fab svg{ width:22px; height:22px; transition:transform .2s ease; }
+  .qm-fab.open svg{ transform:rotate(45deg); }
+
+  .settings-desc{ font-size:13px; color:var(--text-secondary); margin:0 0 22px 0; }
+  .settings-section{ margin-bottom:26px; max-width:640px; }
+  .settings-section-title{ font-size:15px; font-weight:700; margin:0 0 10px 0; color:var(--text-primary); }
+  .settings-list{
+    display:flex; flex-direction:column;
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px;
+    overflow:hidden;
+  }
+  .settings-row{
+    display:flex; align-items:center; gap:12px; padding:12px 16px;
+    border-bottom:1px solid var(--card-border);
+  }
+  .settings-row:last-child{ border-bottom:none; }
+  .settings-icon{
+    width:30px; height:30px; border-radius:9px; flex-shrink:0;
+    background:linear-gradient(135deg, rgba(123,92,255,0.16), rgba(46,201,201,0.12));
+    border:1px solid rgba(123,92,255,0.22); color:#5b4bc4;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .settings-icon svg{ width:15px; height:15px; }
+  .settings-name{ font-size:13.5px; font-weight:600; color:var(--text-primary); flex:1; }
+  .switch{ position:relative; display:inline-block; width:38px; height:22px; flex-shrink:0; }
+  .switch input{ opacity:0; width:0; height:0; position:absolute; }
+  .switch-track{
+    position:absolute; inset:0; background:#d7dade; border-radius:999px;
+    transition:background .15s ease; cursor:pointer;
+  }
+  .switch-track::before{
+    content:""; position:absolute; top:2px; left:2px; width:18px; height:18px;
+    border-radius:50%; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,0.2);
+    transition:transform .15s ease;
+  }
+  .switch input:checked + .switch-track{ background:var(--accent); }
+  .switch input:checked + .switch-track::before{ transform:translateX(16px); }
+
+  .recent-panel{
+    position:fixed; right:28px; bottom:98px; z-index:80;
+    width:260px;
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px;
+    box-shadow:0 16px 40px rgba(20,23,28,0.18);
+    padding:16px;
+    opacity:0; transform:translateY(8px) scale(.98); pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .recent-panel.open{ opacity:1; transform:translateY(0) scale(1); pointer-events:auto; }
+  .recent-panel-header{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+  .recent-panel h3{ margin:0; font-size:14.5px; font-weight:700; color:var(--text-primary); }
+  .recent-list{ display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; }
+  .recent-row{ display:flex; align-items:center; gap:10px; padding:6px 4px; border-radius:8px; }
+  .recent-row:hover{ background:#f5f6f7; }
+  .recent-row .ri-icon{
+    width:30px; height:30px; border-radius:50%; flex-shrink:0;
+    display:flex; align-items:center; justify-content:center;
+    background:#eef0f2; color:var(--text-secondary);
+  }
+  .recent-row .ri-icon svg{ width:14px; height:14px; }
+  .recent-row .ri-name{ font-size:12.5px; font-weight:600; color:var(--text-primary); }
+  .recent-list-empty{ font-size:12px; color:var(--text-muted); text-align:center; padding:16px 0; }
 </style>
 </head>
 <body>
+
+<div class="quick-menu" id="quickMenu">
+  <div class="qm-items" id="qmItems">
+    <button class="qm-item" id="qmRecentBtn" type="button">
+      <span class="qm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></span>
+      최근 사용
+    </button>
+    <button class="qm-item" id="qmFeedbackBtn" type="button">
+      <span class="qm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg></span>
+      문의하기
+    </button>
+  </div>
+  <button class="qm-fab" id="qmFab" type="button" aria-label="퀵메뉴 열기">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+  </button>
+</div>
+
+<div class="recent-panel" id="recentPanel">
+  <div class="recent-panel-header">
+    <h3>최근 사용</h3>
+    <button class="fb-close" id="recentPanelClose" type="button" aria-label="닫기">&times;</button>
+  </div>
+  <div class="recent-list" id="recentList"></div>
+</div>
+
+<div class="feedback-panel" id="feedbackPanel">
+  <div class="feedback-panel-header">
+    <h3>문의 게시판</h3>
+    <button class="fb-close" id="feedbackClose" type="button" aria-label="닫기">&times;</button>
+  </div>
+  <p>불편한 점이나 개선 아이디어를 남겨주세요.</p>
+  <textarea placeholder="내용을 입력해주세요"></textarea>
+  <div class="fb-actions">
+    <button class="fb-submit" type="button">보내기</button>
+  </div>
+</div>
 
 <aside class="sidebar" id="sidebar">
   <div class="sidebar-header">
@@ -284,7 +461,8 @@ const ICONS = {
   layouttemplate: '<rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/>',
   table: '<path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/>',
   ox: '<circle cx="7" cy="12" r="5"/><line x1="15" y1="7" x2="21" y2="17"/><line x1="21" y1="7" x2="15" y2="17"/>',
-  numcards: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/><circle cx="6" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="6" cy="13" r="1" fill="currentColor" stroke="none"/>'
+  numcards: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/><circle cx="6" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="6" cy="13" r="1" fill="currentColor" stroke="none"/>',
+  settings: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>'
 };
 function icon(name, strokeWidth){
   const sw = strokeWidth || 2;
@@ -371,7 +549,8 @@ const COMMON_NAV_ITEMS = [
 ];
 const FOOTER_NAV_ITEMS = [
   { key:"guide", icon:"help", label:"이용 가이드" },
-  { key:"account", icon:"user", label:"loginID" }
+  { key:"account", icon:"user", label:"loginID" },
+  { key:"settings", icon:"settings", label:"설정" }
 ];
 function renderNavList(containerId, items){
   const container = document.getElementById(containerId);
@@ -411,27 +590,30 @@ function getProgress(progKey, defaultStatus){
   return USER_PROGRESS[progKey];
 }
 
+const FEATURE_ENABLED = {};
+function isFeatureEnabled(featKey){
+  return FEATURE_ENABLED[featKey] !== false;
+}
+
 function renderCardsPage(eyebrow, titleHtml, cards, pageKey){
   const cardsHtml = cards.map((c, i) => {
+    const featKey = `${pageKey}_${i}`;
+    if(!isFeatureEnabled(featKey)) return "";
     const disabled = c.status === "wip";
-    const progKey = `${pageKey}_${i}`;
+    const progKey = featKey;
     const progress = getProgress(progKey, c.status);
     const options = Object.keys(PROGRESS_META).map(val =>
       `<option value="${val}" ${val === progress ? "selected" : ""}>${PROGRESS_META[val]}</option>`
     ).join("");
     return `
-      <div class="card ${disabled ? "disabled" : ""}">
+      <div class="card ${disabled ? "disabled" : ""}" data-card-name="${c.name}" data-card-icon="${c.icon}">
         <div class="card-top">
           <div class="icon-badge">${icon(c.icon)}</div>
-          <div class="card-body">
-            <div class="card-title-row">
-              <p class="card-title">${c.name}</p>
-            </div>
-            <ul class="card-desc">
-              ${c.bullets.map(b => `<li>${b}</li>`).join("")}
-            </ul>
-          </div>
+          <p class="card-title">${c.name}</p>
         </div>
+        <ul class="card-desc">
+          ${c.bullets.map(b => `<li>${b}</li>`).join("")}
+        </ul>
         <div class="tag-row">
           <span class="tag-pill type-${c.type}"><span class="dot"></span>${TYPE_LABEL[c.type]}</span>
           <select class="progress-select ${progress}" data-progress-key="${progKey}" title="내 진행 상태 설정">
@@ -442,12 +624,52 @@ function renderCardsPage(eyebrow, titleHtml, cards, pageKey){
     `;
   }).join("");
 
+  const emptyNote = cardsHtml.trim() === ""
+    ? `<div class="placeholder-panel">설정에서 꺼둔 기능만 있어요. '설정'에서 다시 켜보세요.</div>`
+    : "";
+
   return `
     <div class="page-header">
       ${eyebrow}
       ${titleHtml}
     </div>
     <div class="card-grid">${cardsHtml}</div>
+    ${emptyNote}
+  `;
+}
+
+function renderSettingsPage(){
+  const sections = Object.keys(STAGE_META).map(key => {
+    const meta = STAGE_META[key];
+    const cards = AGENT_DATA[key].cards;
+    const rows = cards.map((c, i) => {
+      const featKey = `${key}_${i}`;
+      const enabled = isFeatureEnabled(featKey);
+      return `
+        <div class="settings-row">
+          <span class="settings-icon">${icon(c.icon)}</span>
+          <span class="settings-name">${c.name}</span>
+          <label class="switch">
+            <input type="checkbox" data-feature-key="${featKey}" ${enabled ? "checked" : ""}>
+            <span class="switch-track"></span>
+          </label>
+        </div>
+      `;
+    }).join("");
+    return `
+      <div class="settings-section">
+        <h2 class="settings-section-title">${meta.num}. ${meta.name}</h2>
+        <div class="settings-list">${rows}</div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="page-header">
+      <h1 class="page-title">설정</h1>
+    </div>
+    <p class="settings-desc">스테이지별로 화면에 노출할 기능을 켜고 끌 수 있어요.</p>
+    ${sections}
   `;
 }
 
@@ -474,6 +696,8 @@ function renderPage(key){
     const eyebrow = `<p class="page-eyebrow">${data.eyebrow}</p>`;
     const titleHtml = `<h1 class="page-title">${data.title}</h1>`;
     main.innerHTML = renderCardsPage(eyebrow, titleHtml, data.cards, key);
+  } else if(key === "settings"){
+    main.innerHTML = renderSettingsPage();
   } else if(PLACEHOLDER_PAGES[key]){
     main.innerHTML = renderPlaceholder(PLACEHOLDER_PAGES[key]);
   } else {
@@ -485,6 +709,17 @@ function renderPage(key){
   });
 
   syncHeaderToGrid();
+  equalizeCardHeights();
+}
+
+function equalizeCardHeights(){
+  const main = document.getElementById("main");
+  const cards = main.querySelectorAll(".card-grid .card");
+  if(!cards.length) return;
+  cards.forEach(c => { c.style.minHeight = ""; });
+  let maxH = 0;
+  cards.forEach(c => { maxH = Math.max(maxH, c.getBoundingClientRect().height); });
+  cards.forEach(c => { c.style.minHeight = maxH + "px"; });
 }
 
 function syncHeaderToGrid(){
@@ -502,7 +737,7 @@ function syncHeaderToGrid(){
 
 window.addEventListener("resize", () => {
   clearTimeout(window.__syncHeaderTimer);
-  window.__syncHeaderTimer = setTimeout(syncHeaderToGrid, 120);
+  window.__syncHeaderTimer = setTimeout(() => { syncHeaderToGrid(); equalizeCardHeights(); }, 120);
 });
 document.addEventListener("DOMContentLoaded", syncHeaderToGrid);
 
@@ -511,21 +746,91 @@ renderNavList("commonNav", COMMON_NAV_ITEMS);
 renderNavList("footerNav", FOOTER_NAV_ITEMS);
 
 document.addEventListener("click", (e) => {
+  const cardEl = e.target.closest(".card");
+  if(cardEl && !e.target.closest(".progress-select")){
+    const name = cardEl.dataset.cardName;
+    const iconName = cardEl.dataset.cardIcon;
+    if(name) recordRecentlyViewed(name, iconName);
+  }
   const target = e.target.closest("[data-page]");
   if(target) renderPage(target.dataset.page);
 });
 
 document.addEventListener("change", (e) => {
   const select = e.target.closest(".progress-select");
-  if(!select) return;
-  const progKey = select.dataset.progressKey;
-  USER_PROGRESS[progKey] = select.value;
-  select.className = `progress-select ${select.value}`;
+  if(select){
+    const progKey = select.dataset.progressKey;
+    USER_PROGRESS[progKey] = select.value;
+    select.className = `progress-select ${select.value}`;
+    return;
+  }
+  const featureToggle = e.target.closest("[data-feature-key]");
+  if(featureToggle){
+    FEATURE_ENABLED[featureToggle.dataset.featureKey] = featureToggle.checked;
+  }
 });
 
 document.getElementById("collapseBtn").addEventListener("click", () => {
   document.getElementById("sidebar").classList.toggle("collapsed");
-  setTimeout(syncHeaderToGrid, 200);
+  setTimeout(() => { syncHeaderToGrid(); equalizeCardHeights(); }, 200);
+});
+
+/* ---------- 최근 사용 ---------- */
+let recentlyViewed = [];
+
+function recordRecentlyViewed(name, iconName){
+  recentlyViewed = recentlyViewed.filter(it => it.name !== name);
+  recentlyViewed.unshift({ name, icon: iconName });
+  if(recentlyViewed.length > 6) recentlyViewed.length = 6;
+  renderRecentList();
+}
+
+function renderRecentList(){
+  const list = document.getElementById("recentList");
+  if(!list) return;
+  if(recentlyViewed.length === 0){
+    list.innerHTML = `<div class="recent-list-empty">아직 열어본 기능이 없어요</div>`;
+    return;
+  }
+  list.innerHTML = recentlyViewed.map(item => `
+    <div class="recent-row">
+      <span class="ri-icon">${icon(item.icon)}</span>
+      <span class="ri-name">${item.name}</span>
+    </div>
+  `).join("");
+}
+renderRecentList();
+
+/* ---------- 우측 하단 퀵메뉴 ---------- */
+function closeQuickPanels(){
+  document.getElementById("recentPanel").classList.remove("open");
+  document.getElementById("feedbackPanel").classList.remove("open");
+}
+
+document.getElementById("qmFab").addEventListener("click", () => {
+  document.getElementById("qmFab").classList.toggle("open");
+  document.getElementById("qmItems").classList.toggle("open");
+});
+
+document.getElementById("qmRecentBtn").addEventListener("click", () => {
+  document.getElementById("qmItems").classList.remove("open");
+  document.getElementById("qmFab").classList.remove("open");
+  document.getElementById("feedbackPanel").classList.remove("open");
+  document.getElementById("recentPanel").classList.toggle("open");
+});
+
+document.getElementById("qmFeedbackBtn").addEventListener("click", () => {
+  document.getElementById("qmItems").classList.remove("open");
+  document.getElementById("qmFab").classList.remove("open");
+  document.getElementById("recentPanel").classList.remove("open");
+  document.getElementById("feedbackPanel").classList.toggle("open");
+});
+
+document.getElementById("recentPanelClose").addEventListener("click", () => {
+  document.getElementById("recentPanel").classList.remove("open");
+});
+document.getElementById("feedbackClose").addEventListener("click", () => {
+  document.getElementById("feedbackPanel").classList.remove("open");
 });
 
 renderPage("stage1");
