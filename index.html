@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS 에이전트 시스템</title>
+<style>
+  :root{
+    --sidebar-bg:#14171c;
+    --sidebar-border:#242830;
+    --sidebar-text:#c7cad1;
+    --sidebar-text-dim:#7c828e;
+    --sidebar-active:#1f6f7a;
+    --sidebar-active-bg:#1b2b30;
+    --main-bg:#f6f7f8;
+    --card-bg:#ffffff;
+    --card-border:#e4e6ea;
+    --text-primary:#1a1d22;
+    --text-secondary:#5c6068;
+    --text-muted:#9a9ea6;
+    --accent:#1f6f7a;
+    --pill-agent-bg:#ece9fb;
+    --pill-agent-text:#4c3fb0;
+    --pill-tool-bg:#fff3c4;
+    --pill-tool-text:#8a6a12;
+    --pill-progress-bg:#e6f1fb;
+    --pill-progress-text:#c0392b;
+    --pill-done-bg:#eaf3de;
+    --pill-done-text:#3b6d11;
+    --pill-todo-bg:#eef0f2;
+    --pill-todo-text:#6b6f76;
+    --radius:10px;
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    font-family:var(--font);
+    background:var(--main-bg);
+    color:var(--text-primary);
+    display:flex;
+    min-height:100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:220px;
+    flex-shrink:0;
+    background:
+      radial-gradient(130% 55% at 100% 0%, rgba(31,111,122,0.14), transparent 60%),
+      linear-gradient(180deg, #171d22 0%, #121519 55%, #0d0f12 100%);
+    border-right:1px solid var(--sidebar-border);
+    display:flex;
+    flex-direction:column;
+    padding:18px 12px;
+    position:sticky;
+    top:0;
+    height:100vh;
+    overflow-y:auto;
+    transition:width .18s ease, padding .18s ease;
+  }
+  .sidebar.collapsed{ width:64px; padding:18px 8px; }
+  .sidebar-header{ display:flex; align-items:center; justify-content:flex-end; gap:2px; padding:0 6px 10px 6px; }
+  .sidebar.collapsed .sidebar-header{ justify-content:center; }
+  .sidebar-brand-row{ display:flex; align-items:center; padding:0 6px 18px 6px; }
+  .logo{ display:flex; align-items:center; gap:8px; font-weight:700; font-size:16px; letter-spacing:.3px; }
+  .logo-mark{ width:24px;height:24px;flex-shrink:0; border-radius:7px; background:conic-gradient(from 200deg,#ff3d7a,#7b5cff,#2ec9c9,#f2c94c,#ff3d7a); }
+  .logo-text{ color:#fff; white-space:nowrap; overflow:hidden; }
+  .sidebar.collapsed .logo-text{ display:none; }
+  .sidebar.collapsed .sidebar-brand-row{ justify-content:center; }
+  .collapse-btn, .search-btn{ background:none;border:none;color:var(--sidebar-text-dim); cursor:pointer;padding:4px;border-radius:6px;flex-shrink:0; }
+  .collapse-btn:hover, .search-btn:hover{ background:#20242c;color:#fff; }
+  .collapse-btn svg, .search-btn svg{ display:block; }
+  .sidebar.collapsed .search-btn{ display:none; }
+
+  .nav-section-label{
+    font-size:11px; color:var(--sidebar-text-dim); text-transform:uppercase; letter-spacing:.6px;
+    padding:14px 10px 6px 10px; white-space:nowrap; overflow:hidden;
+  }
+  .sidebar.collapsed .nav-section-label{ opacity:0;height:0;padding:6px 0 0 0;overflow:hidden; }
+
+  .nav-list{ display:flex; flex-direction:column; }
+  .nav-item{
+    display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
+    color:var(--sidebar-text); font-size:13.5px; cursor:pointer; white-space:nowrap;
+    overflow:hidden; text-overflow:ellipsis; border:none; background:none; width:100%;
+    text-align:left; font-family:inherit;
+  }
+  .nav-item .nav-icon{
+    width:24px; height:24px; border-radius:50%; background:#1c2028; color:var(--sidebar-text-dim);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0;
+  }
+  .nav-item .nav-icon svg{ width:13px; height:13px; display:block; }
+  .nav-item:hover{ background:#1c2028;color:#fff; }
+  .nav-item:hover .nav-icon{ color:#fff; }
+  .nav-item.active{ background:var(--sidebar-active-bg); color:#fff; font-weight:600; }
+  .nav-item.active .nav-icon{ background:var(--sidebar-active-bg); color:#fff; }
+  .sidebar.collapsed .nav-item span.label{ display:none; }
+  .sidebar.collapsed .nav-item{ justify-content:center; }
+
+  /* ---------- Stage timeline nav ---------- */
+  .stage-timeline{ display:flex; flex-direction:column; padding:2px 0; }
+  .stage-node{
+    position:relative; height:40px; padding:0 10px; display:flex; align-items:center; gap:10px;
+    border:none; background:none; width:100%; text-align:left; font-family:inherit;
+    font-size:13.5px; color:var(--sidebar-text); cursor:pointer; border-radius:8px;
+  }
+  .stage-node:not(:last-child)::after{
+    content:""; position:absolute; left:20px; top:32px; height:16px;
+    border-left:1.5px dotted var(--sidebar-border); z-index:0;
+  }
+  .stage-node:hover{ background:#1c2028; color:#fff; }
+  .stage-node.active{ background:var(--sidebar-active-bg); color:#fff; font-weight:600; }
+  .node-circle{
+    width:24px; height:24px; border-radius:50%; background:#1c2028; color:var(--sidebar-text-dim);
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; position:relative; z-index:1;
+    transition:box-shadow .15s ease, background .15s ease, color .15s ease;
+  }
+  .node-circle svg{ width:13px; height:13px; display:block; }
+  .stage-node.active .node-circle{
+    background:var(--sidebar-active-bg); color:#fff;
+    box-shadow:0 0 0 3px var(--sidebar-bg), 0 0 0 5px var(--sidebar-active);
+  }
+  .stage-node.collapsed-hide-label .label{ display:none; }
+  .sidebar.collapsed .stage-node{ justify-content:center; padding:0; }
+  .sidebar.collapsed .stage-node::after{ left:50%; margin-left:-0.75px; }
+  .sidebar.collapsed .stage-node .label{ display:none; }
+
+  .sidebar-footer{ margin-top:auto; padding-top:12px; border-top:1px solid var(--sidebar-border); }
+
+  /* ---------- Main ---------- */
+  .content-area{
+    flex:1; min-width:0; position:relative;
+    background:
+      radial-gradient(760px 620px at 4% -10%, rgba(255,61,122,0.20), transparent 62%),
+      radial-gradient(880px 720px at 100% -8%, rgba(46,201,201,0.28), transparent 62%),
+      radial-gradient(820px 680px at 96% 104%, rgba(123,92,255,0.26), transparent 62%),
+      radial-gradient(680px 560px at -4% 104%, rgba(242,201,76,0.20), transparent 62%),
+      var(--main-bg);
+  }
+  .main{ flex:1; min-width:0; position:relative; padding:36px 44px; max-width:1440px; margin:0 auto; }
+  .page-header{ margin-bottom:26px; }
+  .page-eyebrow{ font-size:13px; color:var(--text-muted); margin:0 0 6px 0; font-weight:600; letter-spacing:.3px; }
+  .page-eyebrow.accented{ color:var(--accent); margin-bottom:14px; }
+  .page-title{
+    font-size:24px; font-weight:700; margin:0; display:flex; align-items:center; gap:10px;
+    color:var(--text-primary);
+  }
+
+  .card-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(270px, 336px));
+    justify-content:center;
+    gap:20px;
+  }
+
+  .card{
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px;
+    padding:18px 20px 16px 20px; display:flex; flex-direction:column; gap:12px;
+    cursor:pointer; transition:box-shadow .15s ease, transform .15s ease, border-color .15s ease;
+  }
+  .card:hover{ box-shadow:0 4px 18px rgba(20,23,28,.08); border-color:#d4d7dc; transform:translateY(-1px); }
+  .card.disabled{ opacity:.85; }
+
+  .card-top{ display:flex; gap:12px; align-items:flex-start; flex:1; }
+
+  .icon-badge{
+    flex-shrink:0; width:36px; height:36px; border-radius:11px;
+    background:linear-gradient(135deg, rgba(123,92,255,0.16), rgba(46,201,201,0.12));
+    border:1px solid rgba(123,92,255,0.22);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.55), 0 1px 4px rgba(20,23,28,0.05);
+    color:#5b4bc4;
+    display:flex; align-items:center; justify-content:center;
+    backdrop-filter:blur(3px);
+  }
+  .icon-badge svg{ width:17px; height:17px; display:block; }
+
+  .card-body{ min-width:0; flex:1; }
+  .card-title-row{ display:flex; align-items:baseline; justify-content:space-between; gap:8px; margin-bottom:8px; }
+  .card-title{ font-size:15px; font-weight:700; margin:0; color:var(--text-primary); }
+  .dev-status{ font-size:10.5px; color:var(--text-muted); white-space:nowrap; flex-shrink:0; padding-top:2px; }
+  .card-desc{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:3px; }
+  .card-desc li{ font-size:12.5px; color:var(--text-secondary); line-height:1.5; position:relative; padding-left:10px; }
+  .card-desc li::before{ content:"·"; position:absolute; left:0; color:var(--text-muted); }
+
+  .tag-row{ display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:2px; border-top:1px solid var(--card-border); padding-top:10px; }
+  .tag-pill{ font-size:11px; font-weight:600; padding:3px 9px; border-radius:999px; display:inline-flex; align-items:center; gap:4px; }
+  .tag-pill.type-agent{ background:var(--pill-agent-bg); color:var(--pill-agent-text); }
+  .tag-pill.type-tool{ background:var(--pill-tool-bg); color:var(--pill-tool-text); }
+  .progress-select{
+    appearance:none; -webkit-appearance:none; -moz-appearance:none;
+    background-color:var(--card-bg);
+    border:1px solid var(--card-border);
+    border-radius:6px;
+    padding:3px 20px 3px 9px;
+    font-size:11px;
+    font-weight:600;
+    font-family:inherit;
+    cursor:pointer;
+    background-repeat:no-repeat;
+    background-position:right 6px center;
+    background-size:8px 8px;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2 3.5L5 6.5L8 3.5' fill='none' stroke='%238a8f98' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  }
+  .progress-select:hover{ border-color:#c7cad1; }
+  .progress-select.todo{ color:var(--pill-todo-text); }
+  .progress-select.inprogress{ color:var(--pill-progress-text); }
+  .progress-select.done{ color:var(--pill-done-text); }
+  .tag-pill .dot{ width:5px;height:5px;border-radius:50%;background:currentColor;flex-shrink:0; }
+
+  .placeholder-panel{
+    background:var(--card-bg); border:1px dashed var(--card-border); border-radius:14px;
+    padding:60px 30px; text-align:center; color:var(--text-muted); font-size:14px;
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <button class="search-btn" id="searchBtn" aria-label="검색">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10" cy="10" r="6"/><line x1="15" y1="15" x2="20" y2="20"/></svg>
+    </button>
+    <button class="collapse-btn" id="collapseBtn" aria-label="사이드바 접기/펼치기">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><line x1="9" y1="4" x2="9" y2="20"/></svg>
+    </button>
+  </div>
+  <div class="sidebar-brand-row">
+    <div class="logo">
+      <div class="logo-mark"></div>
+      <span class="logo-text">NEXUS</span>
+    </div>
+  </div>
+
+  <div class="nav-section-label">common</div>
+  <div class="nav-list" id="commonNav"></div>
+
+  <div class="nav-section-label">stage</div>
+  <div class="stage-timeline" id="stageTimeline"></div>
+
+  <div class="sidebar-footer">
+    <div class="nav-list" id="footerNav"></div>
+  </div>
+</aside>
+
+<div class="content-area">
+  <main class="main" id="main"></main>
+</div>
+
+<script>
+/* ---------- 라인 아이콘 (24x24, stroke 기반) ---------- */
+const ICONS = {
+  search: '<path d="m21 21-4.34-4.34"/><circle cx="11" cy="11" r="8"/>',
+  columns: '<rect width="18" height="18" x="3" y="3" rx="2"/><path d="M12 3v18"/>',
+  database: '<ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5V19A9 3 0 0 0 21 19V5"/><path d="M3 12A9 3 0 0 0 21 12"/>',
+  bulb: '<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  layout: '<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  check: '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  filetext: '<path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"/><path d="M14 2v5a1 1 0 0 0 1 1h5"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  edit: '<path d="M13 21h8"/><path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
+  list: '<path d="M3 5h.01"/><path d="M3 12h.01"/><path d="M3 19h.01"/><path d="M8 5h13"/><path d="M8 12h13"/><path d="M8 19h13"/>',
+  image: '<rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/>',
+  invoice: '<path d="M12 17V7"/><path d="M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8"/><path d="M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z"/>',
+  shapes: '<path d="M8.3 10a.7.7 0 0 1-.626-1.079L11.4 3a.7.7 0 0 1 1.198-.043L16.3 8.9a.7.7 0 0 1-.572 1.1Z"/><rect x="3" y="14" width="7" height="7" rx="1"/><circle cx="17.5" cy="17.5" r="3.5"/>',
+  copyright: '<circle cx="12" cy="12" r="10"/><path d="M14.83 14.83a4 4 0 1 1 0-5.66"/>',
+  pointer: '<path d="M14 4.1 12 6"/><path d="m5.1 8-2.9-.8"/><path d="m6 12-1.9 2"/><path d="M7.2 2.2 8 5.1"/><path d="M9.037 9.69a.498.498 0 0 1 .653-.653l11 4.5a.5.5 0 0 1-.074.949l-4.349 1.041a1 1 0 0 0-.74.739l-1.04 4.35a.5.5 0 0 1-.95.074z"/>',
+  bookopen: '<path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/>',
+  refresh: '<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  monitor: '<rect width="20" height="14" x="2" y="3" rx="2"/><line x1="8" x2="16" y1="21" y2="21"/><line x1="12" x2="12" y1="17" y2="21"/>',
+  gamepad: '<line x1="6" x2="10" y1="11" y2="11"/><line x1="8" x2="8" y1="9" y2="13"/><line x1="15" x2="15.01" y1="12" y2="12"/><line x1="18" x2="18.01" y1="10" y2="10"/><path d="M17.32 5H6.68a4 4 0 0 0-3.978 3.59c-.006.052-.01.101-.017.152C2.604 9.416 2 14.456 2 16a3 3 0 0 0 3 3c1 0 1.5-.5 2-1l1.414-1.414A2 2 0 0 1 9.828 16h4.344a2 2 0 0 1 1.414.586L17 18c.5.5 1 1 2 1a3 3 0 0 0 3-3c0-1.545-.604-6.584-.685-7.258-.007-.05-.011-.1-.017-.151A4 4 0 0 0 17.32 5z"/>',
+  qrcode: '<rect width="5" height="5" x="3" y="3" rx="1"/><rect width="5" height="5" x="16" y="3" rx="1"/><rect width="5" height="5" x="3" y="16" rx="1"/><path d="M21 16h-3a2 2 0 0 0-2 2v3"/><path d="M21 21v.01"/><path d="M12 7v3a2 2 0 0 1-2 2H7"/><path d="M3 12h.01"/><path d="M12 3h.01"/><path d="M12 16v.01"/><path d="M16 12h1"/><path d="M21 12v.01"/><path d="M12 21v-1"/>',
+  clipboardlist: '<rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/>',
+  video: '<path d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/>',
+  mic: '<path d="M12 19v3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><rect x="9" y="2" width="6" height="13" rx="3"/>',
+  subtitles: '<rect width="18" height="14" x="3" y="5" rx="2" ry="2"/><path d="M7 15h4M15 15h2M7 11h2M13 11h4"/>',
+  bookcheck: '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H19a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1H6.5a1 1 0 0 1 0-5H20"/><path d="m9 9.5 2 2 4-4"/>',
+  network: '<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/>',
+  tag: '<path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8.704 8.704a2.426 2.426 0 0 0 3.42 0l6.58-6.58a2.426 2.426 0 0 0 0-3.42z"/><circle cx="7.5" cy="7.5" r=".5" fill="currentColor"/>',
+  folder: '<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>',
+  help: '<circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+  calendar: '<path d="M8 2v4"/><path d="M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18"/>',
+  user: '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+  eye: '<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  layouttemplate: '<rect width="18" height="7" x="3" y="3" rx="1"/><rect width="9" height="7" x="3" y="14" rx="1"/><rect width="5" height="7" x="16" y="14" rx="1"/>',
+  table: '<path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/>',
+  ox: '<circle cx="7" cy="12" r="5"/><line x1="15" y1="7" x2="21" y2="17"/><line x1="21" y1="7" x2="15" y2="17"/>',
+  numcards: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/><circle cx="6" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="6" cy="13" r="1" fill="currentColor" stroke="none"/>'
+};
+function icon(name, strokeWidth){
+  const sw = strokeWidth || 2;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="${sw}" stroke-linecap="round" stroke-linejoin="round">${ICONS[name] || ICONS.help}</svg>`;
+}
+
+const STAGE_META = {
+  stage1: { num:1, name:"분석·설계", icon:"search" },
+  stage2: { num:2, name:"기획·편집", icon:"edit" },
+  stage3: { num:3, name:"디지털 콘텐츠 개발", icon:"monitor" },
+  stage4: { num:4, name:"미디어 콘텐츠 개발", icon:"video" },
+  stage5: { num:5, name:"품질 검수·관리", icon:"check" },
+  stage6: { num:6, name:"지식맵", icon:"network" }
+};
+
+/* ---------- 데이터 ---------- */
+const AGENT_DATA = {
+  stage1: { cards: [
+    {status:"2026", type:"agent", icon:"eye", name:"교육과정 분석 에이전트", bullets:["교육부 검·인정 실시 공고 분석","과목별 편찬상의 유의점 분석 정리","검정 기준 확인 및 이전 공고와 내용 비교"]},
+    {status:"2026", type:"agent", icon:"bookopen", name:"타사 분석 에이전트", bullets:["출판사별 사양·코너 비교표","교과서별 비교표·배열표 분석","단원 구조·코너별 구성 요소 비교"]},
+    {status:"2026", type:"tool", icon:"clipboardlist", name:"교과서 소재 분석기", bullets:["자·타사 교과서 DB 라이브러리","성취기준별 단원·제재 사례 검색","학습요소·활동 비교 자료 제공"]},
+    {status:"2026", type:"agent", icon:"bulb", name:"체재 기획 에이전트", bullets:["체재 협의 내용 입력","분석 결과 기반 체재 견본 생성","체재 구성 및 주요 내용 정리 분석"]},
+    {status:"2026", type:"tool", icon:"layouttemplate", name:"레이아웃 초안 생성기", bullets:["체재 견본 기반 레이아웃 생성","활동 유형별 레이아웃 자동 구성"]}
+  ]},
+  stage2: { cards: [
+    {status:"2026", type:"agent", icon:"table", name:"세목 배열표 검증 에이전트", bullets:["세목 배열표 성취기준 매핑 완전성 검증","차시·페이지 배분, 학습 계열 정합성 점검","누락·중복·분량 불균형 자동 검출"]},
+    {status:"2026", type:"agent", icon:"filetext", name:"원고 검토 에이전트", bullets:["성취기준·세목 배열표 부합도 검토","내용 사실 정확성, 학년 수준 적정성 점검","편향·차별 표현 및 용어 일관성 검출"]},
+    {status:"2026", type:"agent", icon:"edit", name:"편집·교정 에이전트", bullets:["편수자료 기준 맞춤법·표기 규정 검수","문장 비문·가독성 및 문체 일관성 교정","용어 표기 통일 및 부호·단위 사용 점검"]},
+    {status:"2026", type:"agent", icon:"ox", name:"정답·해설 에이전트", bullets:["단계별 풀이·오답 분석 해설 초안 생성","성취기준·개념 연계 및 채점 기준 정리","문항 정답 확정 및 정확성 검증"]},
+    {status:"2026", type:"agent", icon:"image", name:"삽화 시안 에이전트", bullets:["원고·배열표 기반 삽화 프롬프트 생성","시드 이미지·페르소나 적용 AI 시안 생성","삽화 콘셉트 및 장면 설명 자동 생성"]},
+    {status:"2026", type:"tool", icon:"invoice", name:"삽화 발주서 생성기", bullets:["시안·사양 발주서 초안 자동 채움","삽화 건별 발주 항목 일괄 생성","표준 발주서 포맷 출력(시안 첨부)"]},
+    {status:"wip", type:"agent", icon:"numcards", name:"수학 이미지컷 에이전트", bullets:["도형·수모형 등 수학 도식 정밀 생성","수치·비율 파라미터 기반 정확성 보장","규칙 기반 표준 이미지컷 출력"]},
+    {status:"2027", type:"agent", icon:"copyright", name:"저작권·출처 에이전트", bullets:["사용 이미지·사진 인용 자료 출처 취합","저작권·이용허락 상태 점검 및 누락 검출","이용허락 신청서 생성 · 표준 출처 목록포맷 출력"]}
+  ]},
+  stage3: { cards: [
+    {status:"2027", type:"agent", icon:"layout", name:"UXUI 설계 에이전트", bullets:["페이지 레이아웃·그리드 구조 설계","해상도·디바이스별 반응형 웹페이지 구성","디자인·스타일 가이드 기반 화면 구현"]},
+    {status:"wip", type:"tool", icon:"pointer", name:"인터랙티브 콘텐츠 생성", bullets:["교과서 콘텐츠 분석·구조화","인터랙티브 유형 라이브러리 매핑","차시 수업 화면(html) 자동 생성"]},
+    {status:"2027", type:"tool", icon:"bookopen", name:"E-Book 편집기", bullets:["웹뷰어 이북 변환·구성","목차·페이지 순서·메타 편집","페이지 넘김·검색·북마크 기반 열람"]},
+    {status:"wip", type:"agent", icon:"list", name:"문항 추출 에이전트", bullets:["문항 단위 추출 및 구조 분해","유형별 인터랙션 템플릿 구성(html)","정답·해설·배점 메타데이터 부여"]},
+    {status:"wip", type:"tool", icon:"refresh", name:"유사 문항 생성", bullets:["숫자·소재·맥락 변형한 유사 문항 생성","원본 문항 기반 변형 규칙 추출","정답·해설 재생성 및 품질 검증"]},
+    {status:"2027", type:"agent", icon:"monitor", name:"수업용 PPT 에이전트", bullets:["PDF·차시 콘텐츠에서 자동 추출","표준 템플릿 기반 슬라이드 자동 구성","학습목표·차시 구조 반영 PPT 생성"]},
+    {status:"wip", type:"agent", icon:"gamepad", name:"학습 게임 에이전트", bullets:["게임 메커닉 매핑(점수·레벨·미션)","유형별 게임 템플릿 기반 학습 게임 생성","난이도·진행·보상 로직 설정 및 검증"]},
+    {status:"wip", type:"tool", icon:"qrcode", name:"QR·Short URL 생성기", bullets:["콘텐츠 URL의 단축 주소 자동 생성","QR 코드 일괄 생성(포맷·해상도·에러정정 설정)"]}
+  ]},
+  stage4: { cards: [
+    {status:"wip", type:"agent", icon:"clipboardlist", name:"큐시트 에이전트", bullets:["영상·음원 제작용 큐시트 초안 생성","장면별 내레이션·자막·효과음·화면 구성","촬영·편집 진행을 위한 제작 지시 구조화"]},
+    {status:"wip", type:"agent", icon:"image", name:"이미지 에이전트", bullets:["원고·콘티 기반 필요 이미지 요소 추출","이미지 생성 프롬프트 및 스타일 작성","생성 이미지 후보 검토 및 활용 메타데이터 정리"]},
+    {status:"wip", type:"agent", icon:"video", name:"영상 에이전트", bullets:["큐시트를 기반으로 씬별 대사, 연기, 배경 설명 프롬프트를 분석해 영상 자동 생성"]},
+    {status:"wip", type:"tool", icon:"mic", name:"음성·음원 생성기", bullets:["역할별 성우 음성(TTS) 생성","배경 음원·효과음 생성","언어·성별·톤 설정 기반 음원 출력"]},
+    {status:"wip", type:"tool", icon:"subtitles", name:"자막 생성기", bullets:["영상 STT 기반 자막 스크립트 초안 생성","스크립트 추출·편집 및 타임코드 보정","웹자막(VTT) 변환·다운로드"]}
+  ]},
+  stage5: { cards: [
+    {status:"2027", type:"agent", icon:"bookopen", name:"(수정)서책 검수 에이전트", bullets:["교육부 검정기준 항목별 충족 여부 검수","교과서·지도서의 기준 부합성 점검","미충족 항목 보완 필요 사항 리포트 생성"]},
+    {status:"2027", type:"agent", icon:"check", name:"디지털 콘텐츠 검수 에이전트", bullets:["학습자 페르소나 기반 사용성 검증","교과서 연계성 및 용어 일관성 검증","UX·접근성 개선 리포트 생성"]},
+    {status:"2027", type:"tool", icon:"eye", name:"수정보완대조표 생성기", bullets:["심사 의견 기반 수정·보완 항목 자동 분류","수정보완대조표 및 자체 수정보완대조표 초안 작성","반영 내용·근거·페이지 정보 매핑"]}
+  ]},
+  stage6: { cards: [
+    {status:"db", type:"tool", icon:"tag", name:"성취기준 식별코드 생성기", bullets:["검·인정 교과서 교육부 고시 전 교과 성취기준 및 수준 추출 DB화","신구 교육과정 대조표"]},
+    {status:"db", type:"agent", icon:"network", name:"iGraph 지식맵 에이전트", bullets:["성취기준·콘텐츠·문항·학습데이터를 연결하는 교과 지식맵 자동 생성"]}
+  ]},
+  library: { eyebrow:"common", title:"라이브러리", cards: [
+    {status:"2027", type:"tool", icon:"folder", name:"활동 유형 라이브러리", bullets:["인터랙티브 활동 학습 유형 분류 및 관리"]},
+    {status:"2027", type:"tool", icon:"folder", name:"교과서 산출물 라이브러리", bullets:["교과서 제출용 판형 파일 업로드 및 관리","본책·부속책·지도서·전자책 산출물 분류","제출 버전 및 최종본 이력 관리"]}
+  ]},
+  guide: { eyebrow:"common", title:"이용 가이드", cards: [
+    {status:"wip", type:"tool", icon:"help", name:"InCopy 사용 가이드", bullets:["주요 기능·설정 방법 제공","자주 발생하는 오류 해결 가이드"]}
+  ]}
+};
+
+const DEV_STATUS_LABEL = { "2026": "2026 하반기", "2027": "2027 예정", "wip": "작업중", "db": "DB" };
+const TYPE_LABEL = { agent: "에이전트", tool: "툴" };
+
+const PLACEHOLDER_PAGES = {
+  wbs: {eyebrow:"common", title:"업무일정 관리(WBS)", note:"프로젝트 단위 업무 일정과 담당자를 관리하는 화면입니다. 상세 UI는 준비 중입니다."},
+  filename: {eyebrow:"common", title:"표준 파일명 생성기", note:"교과서 산출물의 표준 파일명 규칙에 맞춰 파일명을 자동 생성하는 도구입니다. 상세 UI는 준비 중입니다."},
+  account: {eyebrow:"account", title:"loginID", note:"계정 정보 및 로그아웃 메뉴가 표시되는 영역입니다."}
+};
+
+/* ---------- 사이드바 COMMON/footer nav 렌더 ---------- */
+const COMMON_NAV_ITEMS = [
+  { key:"wbs", icon:"calendar", label:"업무일정 관리(WBS)" },
+  { key:"filename", icon:"tag", label:"표준 파일명 생성기" },
+  { key:"library", icon:"folder", label:"라이브러리" }
+];
+const FOOTER_NAV_ITEMS = [
+  { key:"guide", icon:"help", label:"이용 가이드" },
+  { key:"account", icon:"user", label:"loginID" }
+];
+function renderNavList(containerId, items){
+  const container = document.getElementById(containerId);
+  container.innerHTML = items.map(it => `
+    <button class="nav-item" data-page="${it.key}">
+      <span class="nav-icon">${icon(it.icon)}</span>
+      <span class="label">${it.label}</span>
+    </button>
+  `).join("");
+}
+
+/* ---------- 사이드바 stage 타임라인 렌더 ---------- */
+function renderStageTimeline(){
+  const container = document.getElementById("stageTimeline");
+  container.innerHTML = Object.keys(STAGE_META).map(key => {
+    const meta = STAGE_META[key];
+    return `
+      <button class="stage-node ${key === "stage1" ? "active" : ""}" data-page="${key}">
+        <span class="node-circle">${icon(meta.icon)}</span>
+        <span class="label">${meta.name}</span>
+      </button>
+    `;
+  }).join("");
+}
+
+const PROGRESS_META = {
+  todo: "진행전",
+  inprogress: "진행중",
+  done: "완료"
+};
+
+const USER_PROGRESS = {};
+function getProgress(progKey, defaultStatus){
+  if(!(progKey in USER_PROGRESS)){
+    USER_PROGRESS[progKey] = "todo";
+  }
+  return USER_PROGRESS[progKey];
+}
+
+function renderCardsPage(eyebrow, titleHtml, cards, pageKey){
+  const cardsHtml = cards.map((c, i) => {
+    const disabled = c.status === "wip";
+    const progKey = `${pageKey}_${i}`;
+    const progress = getProgress(progKey, c.status);
+    const options = Object.keys(PROGRESS_META).map(val =>
+      `<option value="${val}" ${val === progress ? "selected" : ""}>${PROGRESS_META[val]}</option>`
+    ).join("");
+    return `
+      <div class="card ${disabled ? "disabled" : ""}">
+        <div class="card-top">
+          <div class="icon-badge">${icon(c.icon)}</div>
+          <div class="card-body">
+            <div class="card-title-row">
+              <p class="card-title">${c.name}</p>
+            </div>
+            <ul class="card-desc">
+              ${c.bullets.map(b => `<li>${b}</li>`).join("")}
+            </ul>
+          </div>
+        </div>
+        <div class="tag-row">
+          <span class="tag-pill type-${c.type}"><span class="dot"></span>${TYPE_LABEL[c.type]}</span>
+          <select class="progress-select ${progress}" data-progress-key="${progKey}" title="내 진행 상태 설정">
+            ${options}
+          </select>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  return `
+    <div class="page-header">
+      ${eyebrow}
+      ${titleHtml}
+    </div>
+    <div class="card-grid">${cardsHtml}</div>
+  `;
+}
+
+function renderPlaceholder(data){
+  return `
+    <div class="page-header">
+      <p class="page-eyebrow">${data.eyebrow}</p>
+      <h1 class="page-title">${data.title}</h1>
+    </div>
+    <div class="placeholder-panel">${data.note}</div>
+  `;
+}
+
+function renderPage(key){
+  const main = document.getElementById("main");
+
+  if(STAGE_META[key]){
+    const meta = STAGE_META[key];
+    const eyebrow = `<p class="page-eyebrow accented">stage ${meta.num}</p>`;
+    const titleHtml = `<h1 class="page-title">${meta.name}</h1>`;
+    main.innerHTML = renderCardsPage(eyebrow, titleHtml, AGENT_DATA[key].cards, key);
+  } else if(AGENT_DATA[key]){
+    const data = AGENT_DATA[key];
+    const eyebrow = `<p class="page-eyebrow">${data.eyebrow}</p>`;
+    const titleHtml = `<h1 class="page-title">${data.title}</h1>`;
+    main.innerHTML = renderCardsPage(eyebrow, titleHtml, data.cards, key);
+  } else if(PLACEHOLDER_PAGES[key]){
+    main.innerHTML = renderPlaceholder(PLACEHOLDER_PAGES[key]);
+  } else {
+    main.innerHTML = renderPlaceholder({eyebrow:"", title:"페이지를 찾을 수 없습니다", note:"요청하신 화면이 존재하지 않습니다."});
+  }
+
+  document.querySelectorAll(".nav-item, .stage-node").forEach(item => {
+    item.classList.toggle("active", item.dataset.page === key);
+  });
+
+  syncHeaderToGrid();
+}
+
+function syncHeaderToGrid(){
+  const main = document.getElementById("main");
+  const header = main.querySelector(".page-header");
+  const firstCard = main.querySelector(".card-grid .card");
+  if(!header) return;
+  if(!firstCard){ header.style.paddingLeft = "0px"; return; }
+  const mainRect = main.getBoundingClientRect();
+  const mainPaddingLeft = parseFloat(getComputedStyle(main).paddingLeft) || 0;
+  const cardRect = firstCard.getBoundingClientRect();
+  const offset = Math.max(0, cardRect.left - mainRect.left - mainPaddingLeft);
+  header.style.paddingLeft = offset + "px";
+}
+
+window.addEventListener("resize", () => {
+  clearTimeout(window.__syncHeaderTimer);
+  window.__syncHeaderTimer = setTimeout(syncHeaderToGrid, 120);
+});
+document.addEventListener("DOMContentLoaded", syncHeaderToGrid);
+
+renderStageTimeline();
+renderNavList("commonNav", COMMON_NAV_ITEMS);
+renderNavList("footerNav", FOOTER_NAV_ITEMS);
+
+document.addEventListener("click", (e) => {
+  const target = e.target.closest("[data-page]");
+  if(target) renderPage(target.dataset.page);
+});
+
+document.addEventListener("change", (e) => {
+  const select = e.target.closest(".progress-select");
+  if(!select) return;
+  const progKey = select.dataset.progressKey;
+  USER_PROGRESS[progKey] = select.value;
+  select.className = `progress-select ${select.value}`;
+});
+
+document.getElementById("collapseBtn").addEventListener("click", () => {
+  document.getElementById("sidebar").classList.toggle("collapsed");
+  setTimeout(syncHeaderToGrid, 200);
+});
+
+renderPage("stage1");
+</script>
+
+</body>
+</html>
