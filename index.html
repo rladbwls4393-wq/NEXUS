@@ -45,7 +45,7 @@
 
   /* ---------- Sidebar ---------- */
   .sidebar{
-    width:220px;
+    width:244px;
     flex-shrink:0;
     background:
       radial-gradient(130% 55% at 100% 0%, rgba(31,111,122,0.14), transparent 60%),
@@ -64,8 +64,8 @@
   .sidebar-header{ display:flex; align-items:center; justify-content:flex-end; gap:2px; padding:0 6px 10px 6px; }
   .sidebar.collapsed .sidebar-header{ justify-content:center; }
   .sidebar-brand-row{ display:flex; align-items:center; padding:0 6px 18px 6px; }
-  .logo{ display:flex; align-items:center; gap:4px; font-weight:700; font-size:19px; letter-spacing:.3px; }
-  .logo-mark{ width:38px;height:38px;flex-shrink:0; object-fit:contain; display:block; }
+  .logo{ display:flex; align-items:center; gap:4px; font-weight:700; font-size:22px; letter-spacing:.3px; }
+  .logo-mark{ width:46px;height:46px;flex-shrink:0; object-fit:contain; display:block; }
   .logo-text{ color:#fff; white-space:nowrap; overflow:hidden; }
   .sidebar.collapsed .logo-text{ display:none; }
   .sidebar.collapsed .sidebar-brand-row{ justify-content:center; }
@@ -74,6 +74,7 @@
   .collapse-btn svg, .search-btn svg{ display:block; }
   .sidebar.collapsed .search-btn{ display:none; }
 
+  .sidebar-divider{ height:1px; background:var(--sidebar-border); margin:10px 8px; flex-shrink:0; }
   .nav-section-label{
     font-size:11px; color:var(--sidebar-text-dim); text-transform:uppercase; letter-spacing:.6px;
     padding:14px 10px 6px 10px; white-space:nowrap; overflow:hidden;
@@ -140,7 +141,7 @@
       radial-gradient(680px 560px at -4% 104%, rgba(242,201,76,0.20), transparent 62%),
       var(--main-bg);
   }
-  .main{ flex:1; min-width:0; position:relative; padding:36px 44px; max-width:1440px; margin:0 auto; }
+  .main{ flex:1; min-width:0; position:relative; padding:64px 44px 36px; max-width:1440px; margin:0 auto; }
   .page-header{ margin-bottom:26px; }
   .page-eyebrow{ font-size:13px; color:var(--text-muted); margin:0 0 6px 0; font-weight:600; letter-spacing:.3px; }
   .page-eyebrow.accented{
@@ -166,11 +167,11 @@
   }
 
   .card{
-    background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px;
+    background:var(--card-bg); border:1px solid #c3c7cd; border-radius:14px;
     padding:18px 20px 16px 20px; display:flex; flex-direction:column; gap:12px;
     cursor:pointer; transition:box-shadow .15s ease, transform .15s ease, border-color .15s ease;
   }
-  .card:hover{ box-shadow:0 4px 18px rgba(20,23,28,.08); border-color:#d4d7dc; transform:translateY(-1px); }
+  .card:hover{ box-shadow:0 4px 18px rgba(123,92,255,.18); border-color:#7b5cff; transform:translateY(-1px); }
   .card.disabled{ opacity:.85; }
 
   .card-top{ display:flex; gap:12px; align-items:center; }
@@ -199,7 +200,7 @@
   .progress-select{
     appearance:none; -webkit-appearance:none; -moz-appearance:none;
     background-color:var(--card-bg);
-    border:1px solid var(--card-border);
+    border:1px solid #c3c7cd;
     border-radius:6px;
     padding:3px 20px 3px 9px;
     font-size:11px;
@@ -485,6 +486,8 @@
   <div class="nav-section-label">common</div>
   <div class="nav-list" id="commonNav"></div>
 
+  <div class="sidebar-divider"></div>
+
   <div class="nav-section-label">stage</div>
   <div class="stage-timeline" id="stageTimeline"></div>
 
@@ -535,7 +538,12 @@ const ICONS = {
   table: '<path d="M12 3v18"/><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M3 9h18"/><path d="M3 15h18"/>',
   ox: '<circle cx="7" cy="12" r="5"/><line x1="15" y1="7" x2="21" y2="17"/><line x1="21" y1="7" x2="15" y2="17"/>',
   numcards: '<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/><circle cx="6" cy="7" r="1" fill="currentColor" stroke="none"/><circle cx="9" cy="10" r="1" fill="currentColor" stroke="none"/><circle cx="6" cy="13" r="1" fill="currentColor" stroke="none"/>',
-  settings: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>'
+  settings: '<path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/>',
+  archive: '<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  megaphone: '<path d="M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"/><path d="M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14"/><path d="M8 6v8"/>',
+  zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  searchcompare: '<circle cx="8" cy="8" r="4.5"/><line x1="11.2" y1="11.2" x2="14" y2="14"/><circle cx="15" cy="15" r="4.5"/><line x1="18.2" y1="18.2" x2="21" y2="21"/>',
+  monitorsearch: '<rect x="1" y="2" width="14" height="10" rx="1.5"/><line x1="5" y1="15.5" x2="11" y2="15.5"/><line x1="8" y1="12" x2="8" y2="15.5"/><circle cx="16.5" cy="15.5" r="4.7"/><line x1="19.8" y1="18.8" x2="22.5" y2="21.5"/>'
 };
 function icon(name, strokeWidth){
   const sw = strokeWidth || 2;
@@ -554,7 +562,8 @@ const STAGE_META = {
 /* ---------- 데이터 ---------- */
 const AGENT_DATA = {
   stage1: { cards: [
-    {status:"2026", type:"agent", icon:"eye", name:"교육과정 분석 에이전트", bullets:["교육부 검·인정 실시 공고 분석","과목별 편찬상의 유의점 분석 정리","검정 기준 확인 및 이전 공고와 내용 비교"]},
+    {status:"2026", type:"agent", icon:"megaphone", name:"검인정 공고 분석 에이전트", bullets:["교육부 검·인정 실시 공고 분석","과목별 편찬상의 유의점 분석 정리","검정 기준 확인 및 이전 공고와 내용 비교"]},
+    {status:"2026", type:"agent", icon:"eye", name:"교육과정 분석 에이전트", bullets:["총론·각론 분석","총론·각론 신구 변경사항 비교","성취기준별 학년·단원 위계 분석"]},
     {status:"2026", type:"agent", icon:"bookopen", name:"타사 분석 에이전트", bullets:["출판사별 사양·코너 비교표","교과서별 비교표·배열표 분석","단원 구조·코너별 구성 요소 비교"]},
     {status:"2026", type:"tool", icon:"clipboardlist", name:"교과서 소재 분석기", bullets:["자·타사 교과서 DB 라이브러리","성취기준별 단원·제재 사례 검색","학습요소·활동 비교 자료 제공"]},
     {status:"2026", type:"agent", icon:"bulb", name:"체재 기획 에이전트", bullets:["체재 협의 내용 입력","분석 결과 기반 체재 견본 생성","체재 구성 및 주요 내용 정리 분석"]},
@@ -565,9 +574,9 @@ const AGENT_DATA = {
     {status:"2026", type:"agent", icon:"filetext", name:"원고 검토 에이전트", bullets:["성취기준·세목 배열표 부합도 검토","내용 사실 정확성, 학년 수준 적정성 점검","편향·차별 표현 및 용어 일관성 검출"]},
     {status:"2026", type:"agent", icon:"edit", name:"편집·교정 에이전트", bullets:["편수자료 기준 맞춤법·표기 규정 검수","문장 비문·가독성 및 문체 일관성 교정","용어 표기 통일 및 부호·단위 사용 점검"]},
     {status:"2026", type:"agent", icon:"ox", name:"정답·해설 에이전트", bullets:["단계별 풀이·오답 분석 해설 초안 생성","성취기준·개념 연계 및 채점 기준 정리","문항 정답 확정 및 정확성 검증"]},
-    {status:"2026", type:"agent", icon:"image", name:"삽화 시안 에이전트", bullets:["원고·배열표 기반 삽화 프롬프트 생성","시드 이미지·페르소나 적용 AI 시안 생성","삽화 콘셉트 및 장면 설명 자동 생성"]},
+    {status:"2026", type:"agent", icon:"image", name:"이미지 시안 에이전트", bullets:["시드 이미지·페르소나 적용 AI 시안 생성","삽화 콘셉트 및 장면 설명 자동 생성","셔터스톡·게티·연합뉴스 사진 검색"]},
     {status:"2026", type:"tool", icon:"invoice", name:"삽화 발주서 생성기", bullets:["시안·사양 발주서 초안 자동 채움","삽화 건별 발주 항목 일괄 생성","표준 발주서 포맷 출력(시안 첨부)"]},
-    {status:"wip", type:"agent", icon:"numcards", name:"수학 이미지컷 에이전트", bullets:["도형·수모형 등 수학 도식 정밀 생성","수치·비율 파라미터 기반 정확성 보장","규칙 기반 표준 이미지컷 출력"]},
+    {status:"wip", type:"tool", icon:"numcards", name:"수학 이미지컷 생성기", bullets:["도형·수모형 등 수학 도식 정밀 생성","수치·비율 파라미터 기반 정확성 보장","규칙 기반 표준 이미지컷 출력"]},
     {status:"2027", type:"agent", icon:"copyright", name:"저작권·출처 에이전트", bullets:["사용 이미지·사진 인용 자료 출처 취합","저작권·이용허락 상태 점검 및 누락 검출","이용허락 신청서 생성 · 표준 출처 목록포맷 출력"]}
   ]},
   stage3: { cards: [
@@ -576,8 +585,8 @@ const AGENT_DATA = {
     {status:"2027", type:"tool", icon:"bookopen", name:"E-Book 편집기", bullets:["웹뷰어 이북 변환·구성","목차·페이지 순서·메타 편집","페이지 넘김·검색·북마크 기반 열람"]},
     {status:"wip", type:"agent", icon:"list", name:"문항 추출 에이전트", bullets:["문항 단위 추출 및 구조 분해","유형별 인터랙션 템플릿 구성(html)","정답·해설·배점 메타데이터 부여"]},
     {status:"wip", type:"tool", icon:"refresh", name:"유사 문항 생성", bullets:["숫자·소재·맥락 변형한 유사 문항 생성","원본 문항 기반 변형 규칙 추출","정답·해설 재생성 및 품질 검증"]},
-    {status:"2027", type:"agent", icon:"monitor", name:"수업용 PPT 에이전트", bullets:["PDF·차시 콘텐츠에서 자동 추출","표준 템플릿 기반 슬라이드 자동 구성","학습목표·차시 구조 반영 PPT 생성"]},
-    {status:"wip", type:"agent", icon:"gamepad", name:"학습 게임 에이전트", bullets:["게임 메커닉 매핑(점수·레벨·미션)","유형별 게임 템플릿 기반 학습 게임 생성","난이도·진행·보상 로직 설정 및 검증"]},
+    {status:"2027", type:"agent", icon:"monitor", name:"자료실 에이전트", bullets:["차시·성취기준 기반 수업 자료 통합 생성","평가문항·지도안·교사용 체크리스트 구성","자기·동료 평가지 및 수업용 PPT 생성"]},
+    {status:"wip", type:"tool", icon:"gamepad", name:"학습 게임 라이브러리", bullets:["게임 메커닉 매핑(점수·레벨·미션)","유형별 게임 템플릿 기반 학습 게임 생성","난이도·진행·보상 로직 설정 및 검증"]},
     {status:"wip", type:"tool", icon:"qrcode", name:"QR·Short URL 생성기", bullets:["콘텐츠 URL의 단축 주소 자동 생성","QR 코드 일괄 생성(포맷·해상도·에러정정 설정)"]}
   ]},
   stage4: { cards: [
@@ -589,8 +598,7 @@ const AGENT_DATA = {
   ]},
   stage5: { cards: [
     {status:"2027", type:"agent", icon:"bookopen", name:"(수정)서책 검수 에이전트", bullets:["교육부 검정기준 항목별 충족 여부 검수","교과서·지도서의 기준 부합성 점검","미충족 항목 보완 필요 사항 리포트 생성"]},
-    {status:"2027", type:"agent", icon:"check", name:"디지털 콘텐츠 검수 에이전트", bullets:["학습자 페르소나 기반 사용성 검증","교과서 연계성 및 용어 일관성 검증","UX·접근성 개선 리포트 생성"]},
-    {status:"2027", type:"tool", icon:"eye", name:"수정보완대조표 생성기", bullets:["심사 의견 기반 수정·보완 항목 자동 분류","수정보완대조표 및 자체 수정보완대조표 초안 작성","반영 내용·근거·페이지 정보 매핑"]}
+    {status:"2027", type:"tool", icon:"check", name:"가쇄본 비교 대조기", bullets:["편집본 PDF 쇄별 수정 이력 자동 비교","변경 위치·페이지·항목 매핑 정리","디지털 콘텐츠 반영용 변경 리스트 제공"]}
   ]},
   stage6: { cards: [
     {status:"db", type:"tool", icon:"tag", name:"성취기준 식별코드 생성기", bullets:["검·인정 교과서 교육부 고시 전 교과 성취기준 및 수준 추출 DB화","신구 교육과정 대조표"]},
@@ -611,6 +619,7 @@ const TYPE_LABEL = { agent: "에이전트", tool: "툴" };
 const PLACEHOLDER_PAGES = {
   wbs: {eyebrow:"common", title:"업무일정 관리(WBS)", note:"프로젝트 단위 업무 일정과 담당자를 관리하는 화면입니다. 상세 UI는 준비 중입니다."},
   filename: {eyebrow:"common", title:"표준 파일명 생성기", note:"교과서 산출물의 표준 파일명 규칙에 맞춰 파일명을 자동 생성하는 도구입니다. 상세 UI는 준비 중입니다."},
+  meetingArchive: {eyebrow:"common", title:"회의록 아카이브", note:"편집·저자 회의록을 수집하고 관리하며, 키워드 검색으로 필요한 논의 내용을 찾을 수 있는 화면입니다. 상세 UI는 준비 중입니다."},
   account: {eyebrow:"account", title:"loginID", note:"계정 정보 및 로그아웃 메뉴가 표시되는 영역입니다."}
 };
 
@@ -618,7 +627,8 @@ const PLACEHOLDER_PAGES = {
 const COMMON_NAV_ITEMS = [
   { key:"wbs", icon:"calendar", label:"업무일정 관리(WBS)" },
   { key:"filename", icon:"tag", label:"표준 파일명 생성기" },
-  { key:"library", icon:"folder", label:"라이브러리" }
+  { key:"library", icon:"folder", label:"라이브러리" },
+  { key:"meetingArchive", icon:"archive", label:"회의록 아카이브" }
 ];
 const FOOTER_NAV_ITEMS = [
   { key:"guide", icon:"help", label:"이용 가이드" },
@@ -643,7 +653,7 @@ function renderStageTimeline(){
     return `
       <button class="stage-node ${key === "stage1" ? "active" : ""}" data-page="${key}">
         <span class="node-circle">${icon(meta.icon)}</span>
-        <span class="label">${meta.name}</span>
+        <span class="label">${meta.num}. ${meta.name}</span>
       </button>
     `;
   }).join("");
