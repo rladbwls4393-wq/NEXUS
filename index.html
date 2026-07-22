@@ -103,7 +103,7 @@
     display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px;
     color:var(--sidebar-text); font-size:13.5px; cursor:pointer; white-space:nowrap;
     overflow:hidden; text-overflow:ellipsis; border:none; background:none; width:100%;
-    text-align:left; font-family:inherit;
+    text-align:left; font-family:inherit; text-decoration:none; box-sizing:border-box;
   }
   .nav-item .nav-icon{
     width:24px; height:24px; border-radius:50%; background:#1c2028; color:var(--sidebar-text-dim);
@@ -653,7 +653,7 @@ const PLACEHOLDER_PAGES = {
 
 /* ---------- 사이드바 COMMON/footer nav 렌더 ---------- */
 const COMMON_NAV_ITEMS = [
-  { key:"wbs", icon:"calendar", label:"업무일정 관리(WBS)" },
+  { key:"wbs", icon:"calendar", label:"프로젝트 관리", href:"https://nexus-wbs-fde8b.web.app/" },
   { key:"filename", icon:"tag", label:"표준 파일명 생성기" },
   { key:"library", icon:"folder", label:"라이브러리" },
   { key:"copyright", icon:"copyright", label:"저작권·출처 에이전트" },
@@ -666,12 +666,22 @@ const FOOTER_NAV_ITEMS = [
 ];
 function renderNavList(containerId, items){
   const container = document.getElementById(containerId);
-  container.innerHTML = items.map(it => `
-    <button class="nav-item" data-page="${it.key}">
-      <span class="nav-icon">${icon(it.icon)}</span>
-      <span class="label">${it.label}</span>
-    </button>
-  `).join("");
+  container.innerHTML = items.map(it => {
+    if(it.href){
+      return `
+        <a class="nav-item" href="${it.href}" target="_blank" rel="noopener noreferrer">
+          <span class="nav-icon">${icon(it.icon)}</span>
+          <span class="label">${it.label}</span>
+        </a>
+      `;
+    }
+    return `
+      <button class="nav-item" data-page="${it.key}">
+        <span class="nav-icon">${icon(it.icon)}</span>
+        <span class="label">${it.label}</span>
+      </button>
+    `;
+  }).join("");
 }
 
 /* ---------- 사이드바 stage 타임라인 렌더 ---------- */
