@@ -159,9 +159,11 @@
       radial-gradient(820px 680px at 96% 104%, rgba(123,92,255,0.26), transparent 62%),
       radial-gradient(680px 560px at -4% 104%, rgba(242,201,76,0.20), transparent 62%),
       var(--main-bg);
+    background-attachment:fixed;
   }
   .main{ flex:1; min-width:0; position:relative; padding:55px 44px 36px; max-width:1440px; margin:0 auto; }
   .page-header{ margin-bottom:26px; }
+  .page-header-settings{ margin-bottom:10px; }
   .page-eyebrow{ font-size:13px; color:var(--text-muted); margin:0 0 6px 0; font-weight:600; letter-spacing:.3px; }
   .page-eyebrow.accented{
     display:inline-block;
@@ -318,10 +320,10 @@
   .qm-fab svg{ width:22px; height:22px; transition:transform .2s ease; }
   .qm-fab.open svg{ transform:rotate(45deg); }
 
-  .settings-desc{ font-size:13px; color:var(--text-secondary); margin:0 0 22px 0; }
+  .settings-desc{ font-size:13px; color:var(--text-secondary); margin:0 0 35px 0; }
   .settings-grid{
     display:grid; grid-template-columns:repeat(2, 640px);
-    gap:16px 64px; max-width:none;
+    gap:35px 64px; max-width:none;
   }
   .settings-section{ margin-bottom:0; }
   .settings-section-title{ font-size:15px; font-weight:700; margin:0 0 10px 0; color:var(--text-primary); }
@@ -383,7 +385,13 @@
 
   /* ---------- 메인 상단 검색 바 ---------- */
   .content-topbar{
-    background:transparent;
+    background:
+      radial-gradient(760px 620px at 4% -10%, rgba(255,61,122,0.20), transparent 62%),
+      radial-gradient(880px 720px at 100% -8%, rgba(46,201,201,0.28), transparent 62%),
+      radial-gradient(820px 680px at 96% 104%, rgba(123,92,255,0.26), transparent 62%),
+      radial-gradient(680px 560px at -4% 104%, rgba(242,201,76,0.20), transparent 62%),
+      var(--main-bg);
+    background-attachment:fixed;
     position:sticky; top:0; z-index:20;
     height:60px; box-sizing:border-box;
     display:flex; align-items:center; justify-content:flex-end; padding:0 44px;
@@ -439,6 +447,32 @@
     color:var(--text-muted); text-align:center; z-index:30;
   }
   .notif-dropdown.open{ display:block; }
+  .account-dropdown{
+    display:none; position:absolute; top:calc(100% + 8px); right:0; width:236px;
+    background:var(--card-bg); border:1px solid var(--card-border); border-radius:14px;
+    box-shadow:0 12px 30px rgba(20,23,28,0.15); padding:8px; z-index:30;
+  }
+  .account-dropdown.open{ display:block; }
+  .account-info{ padding:8px 10px 10px 10px; }
+  .account-info-line1{ font-size:13.5px; color:var(--text-primary); line-height:1.5; }
+  .account-name{ font-weight:700; }
+  .account-id{ font-weight:400; color:var(--text-muted); margin-left:2px; font-size:12.5px; }
+  .account-info-line2{ display:flex; align-items:center; gap:6px; margin-top:5px; font-size:12.5px; color:var(--text-secondary); }
+  .role-tag{
+    background:#e0f2fe; color:#0284c7; font-size:11px; font-weight:600;
+    padding:2px 8px; border-radius:999px;
+  }
+  .account-divider{ height:1px; background:var(--card-border); margin:2px 4px 8px 4px; }
+  .account-menu-item{
+    display:flex; align-items:center; gap:10px; width:100%; padding:9px 10px;
+    border:none; background:none; border-radius:9px; cursor:pointer;
+    font-size:13.5px; font-weight:500; color:var(--text-primary); font-family:inherit; text-align:left;
+  }
+  .account-menu-item:hover{ background:#f5f6f7; }
+  .account-menu-item .ami-icon{ width:17px; height:17px; flex-shrink:0; color:var(--text-secondary); display:flex; }
+  .account-menu-item .ami-icon svg{ width:17px; height:17px; }
+  .account-menu-item-danger{ color:#e0483f; }
+  .account-menu-item-danger .ami-icon{ color:#e0483f; }
   .search-result-row{
     display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer;
   }
@@ -552,9 +586,26 @@
       <button class="topbar-icon-btn" data-page="settings" type="button" title="설정">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"/><circle cx="12" cy="12" r="3"/></svg>
       </button>
-      <button class="topbar-icon-btn" data-page="account" type="button" title="로그인">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </button>
+      <div class="topbar-icon-wrap">
+        <button class="topbar-icon-btn" id="topbarAccountBtn" type="button" title="계정">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </button>
+        <div class="account-dropdown" id="accountDropdown">
+          <div class="account-info">
+            <div class="account-info-line1"><strong class="account-name">박지선</strong><span class="account-id">(jisunnie430)</span> <span class="account-id">부장</span></div>
+            <div class="account-info-line2">NEXUS팀 <span class="role-tag">마스터</span></div>
+          </div>
+          <div class="account-divider"></div>
+          <button class="account-menu-item" type="button">
+            <span class="ami-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/></svg></span>
+            비밀번호 변경
+          </button>
+          <button class="account-menu-item account-menu-item-danger" type="button">
+            <span class="ami-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg></span>
+            로그아웃
+          </button>
+        </div>
+      </div>
       <button class="topbar-icon-btn" data-page="guide" type="button" title="이용 가이드">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
       </button>
@@ -839,7 +890,7 @@ function renderSettingsPage(){
   }).join("");
 
   return `
-    <div class="page-header">
+    <div class="page-header page-header-settings">
       <h1 class="page-title">설정</h1>
     </div>
     <p class="settings-desc">스테이지별로 화면에 노출할 기능을 켜고 끌 수 있어요.</p>
@@ -1058,11 +1109,21 @@ function goToSearchResult(pageKey, cardIndex, name, iconName){
 
 document.getElementById("topbarNotifBtn").addEventListener("click", (e) => {
   e.stopPropagation();
+  document.getElementById("accountDropdown").classList.remove("open");
   document.getElementById("notifDropdown").classList.toggle("open");
+});
+document.getElementById("topbarAccountBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  document.getElementById("notifDropdown").classList.remove("open");
+  document.getElementById("accountDropdown").classList.toggle("open");
 });
 document.addEventListener("click", (e) => {
   if(!e.target.closest(".topbar-icon-wrap")){
     document.getElementById("notifDropdown").classList.remove("open");
+    document.getElementById("accountDropdown").classList.remove("open");
+  }
+  if(e.target.closest(".account-menu-item")){
+    document.getElementById("accountDropdown").classList.remove("open");
   }
 });
 
