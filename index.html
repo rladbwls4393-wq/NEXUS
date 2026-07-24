@@ -287,27 +287,7 @@
   .fb-submit:hover{ filter:brightness(1.08); }
 
   /* ---------- 우측 하단 퀵메뉴 ---------- */
-  .quick-menu{ position:fixed; right:28px; bottom:28px; z-index:80; display:flex; flex-direction:column; align-items:flex-end; gap:10px; }
-  .qm-items{
-    display:flex; flex-direction:column; gap:10px; align-items:flex-end;
-    opacity:0; transform:translateY(8px); pointer-events:none;
-    transition:opacity .15s ease, transform .15s ease;
-  }
-  .qm-items.open{ opacity:1; transform:translateY(0); pointer-events:auto; }
-  .qm-item{
-    display:flex; align-items:center; gap:8px;
-    background:#fff; border:1px solid var(--card-border); color:var(--text-primary);
-    padding:8px 16px 8px 8px; border-radius:999px; font-size:13px; font-weight:600;
-    box-shadow:0 6px 16px rgba(20,23,28,0.12); cursor:pointer; font-family:inherit;
-    white-space:nowrap;
-  }
-  .qm-item:hover{ background:#f5f6f7; }
-  .qm-item .qm-icon{
-    width:26px; height:26px; border-radius:50%; flex-shrink:0;
-    display:flex; align-items:center; justify-content:center;
-    background:#eef0f2; color:var(--text-secondary);
-  }
-  .qm-item .qm-icon svg{ width:14px; height:14px; }
+  .quick-menu{ position:fixed; right:28px; bottom:28px; z-index:80; }
 
   .qm-fab{
     width:54px; height:54px; border-radius:50%; border:none; cursor:pointer;
@@ -317,8 +297,7 @@
     transition:transform .2s ease, box-shadow .15s ease;
   }
   .qm-fab:hover{ transform:translateY(-2px); }
-  .qm-fab svg{ width:22px; height:22px; transition:transform .2s ease; }
-  .qm-fab.open svg{ transform:rotate(45deg); }
+  .qm-fab svg{ width:22px; height:22px; }
 
   .settings-desc{ font-size:13px; color:var(--text-secondary); margin:0 0 35px 0; }
   .settings-grid{
@@ -499,40 +478,10 @@
 </head>
 <body>
 
-<div class="quick-menu" id="quickMenu">
-  <div class="qm-items" id="qmItems">
-    <button class="qm-item" id="qmRecentBtn" type="button">
-      <span class="qm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg></span>
-      최근 사용
-    </button>
-    <button class="qm-item" id="qmFeedbackBtn" type="button">
-      <span class="qm-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/></svg></span>
-      문의하기
-    </button>
-  </div>
-  <button class="qm-fab" id="qmFab" type="button" aria-label="퀵메뉴 열기">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+<div class="quick-menu">
+  <button class="qm-fab" data-page="guide" type="button" aria-label="이용 가이드" title="이용 가이드">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><circle cx="12" cy="8" r="0.5" fill="currentColor"/></svg>
   </button>
-</div>
-
-<div class="recent-panel" id="recentPanel">
-  <div class="recent-panel-header">
-    <h3>최근 사용</h3>
-    <button class="fb-close" id="recentPanelClose" type="button" aria-label="닫기">&times;</button>
-  </div>
-  <div class="recent-list" id="recentList"></div>
-</div>
-
-<div class="feedback-panel" id="feedbackPanel">
-  <div class="feedback-panel-header">
-    <h3>문의 게시판</h3>
-    <button class="fb-close" id="feedbackClose" type="button" aria-label="닫기">&times;</button>
-  </div>
-  <p>불편한 점이나 개선 아이디어를 남겨주세요.</p>
-  <textarea placeholder="내용을 입력해주세요"></textarea>
-  <div class="fb-actions">
-    <button class="fb-submit" type="button">보내기</button>
-  </div>
 </div>
 
 <aside class="sidebar" id="sidebar">
@@ -606,9 +555,6 @@
           </button>
         </div>
       </div>
-      <button class="topbar-icon-btn" data-page="guide" type="button" title="이용 가이드">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
-      </button>
     </div>
   </div>
   <main class="main" id="main"></main>
@@ -659,7 +605,9 @@ const ICONS = {
   zap: '<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
   searchcompare: '<circle cx="8" cy="8" r="4.5"/><line x1="11.2" y1="11.2" x2="14" y2="14"/><circle cx="15" cy="15" r="4.5"/><line x1="18.2" y1="18.2" x2="21" y2="21"/>',
   monitorsearch: '<rect x="1" y="2" width="14" height="10" rx="1.5"/><line x1="5" y1="15.5" x2="11" y2="15.5"/><line x1="8" y1="12" x2="8" y2="15.5"/><circle cx="16.5" cy="15.5" r="4.7"/><line x1="19.8" y1="18.8" x2="22.5" y2="21.5"/>',
-  bell: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>'
+  bell: '<path d="M10.268 21a2 2 0 0 0 3.464 0"/><path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326"/>',
+  icmark: '<text x="12" y="18" text-anchor="middle" font-size="20" font-weight="700" font-family="Pretendard, sans-serif" fill="currentColor" stroke="none">Ic</text>',
+  messagecircle: '<g transform="translate(24,0) scale(-1,1)"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"/><circle cx="8.2" cy="10.6" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="10.6" r="1" fill="currentColor" stroke="none"/><circle cx="15.8" cy="10.6" r="1" fill="currentColor" stroke="none"/></g>'
 };
 function icon(name, strokeWidth){
   const sw = strokeWidth || 2;
@@ -726,8 +674,9 @@ const AGENT_DATA = {
     {status:"2027", type:"tool", icon:"folder", name:"교과서 산출물 라이브러리", bullets:["교과서 제출용 판형 파일 업로드 및 관리","본책·부속책·지도서·전자책 산출물 분류","제출 버전 및 최종본 이력 관리"]},
     {status:"2027", type:"tool", icon:"image", name:"삽화가 디렉토리", bullets:["산그림 삽화가 및 삽화풍 탐색","삽화풍·그림체별 스타일 비교"]}
   ]},
-  guide: { eyebrow:"common", title:"이용 가이드", cards: [
-    {status:"wip", type:"tool", icon:"help", name:"InCopy 사용 가이드", bullets:["주요 기능·설정 방법 제공","자주 발생하는 오류 해결 가이드"]}
+  guide: { eyebrow:"", title:"이용 가이드", cards: [
+    {status:"wip", type:"tool", icon:"icmark", name:"InCopy 사용 가이드", bullets:["주요 기능·설정 방법 제공","자주 발생하는 오류 해결 가이드"]},
+    {status:"2027", type:"tool", icon:"messagecircle", name:"F&Q", bullets:["자주 묻는 질문 리스트","질문 게시판 등록"]}
   ]}
 };
 
@@ -745,7 +694,7 @@ const PLACEHOLDER_PAGES = {
 /* ---------- 사이드바 COMMON/footer nav 렌더 ---------- */
 const COMMON_NAV_ITEMS = [
   { key:"wbs", icon:"calendar", label:"프로젝트 관리", href:"https://nexus-wbs-fde8b.web.app/" },
-  { key:"filename", icon:"tag", label:"표준 파일명 생성기" },
+  { key:"filename", icon:"tag", label:"표준 파일명 생성기", href:"https://qrd.i-scream.co.kr//nexus/TEST/nexus_file_naming_v1.html" },
   { key:"library", icon:"folder", label:"라이브러리" },
   { key:"copyright", icon:"copyright", label:"저작권·출처 에이전트" },
   { key:"meetingArchive", icon:"archive", label:"회의록 아카이브" }
@@ -918,7 +867,7 @@ function renderPage(key){
     main.innerHTML = renderCardsPage(eyebrow, titleHtml, AGENT_DATA[key].cards, key);
   } else if(AGENT_DATA[key]){
     const data = AGENT_DATA[key];
-    const eyebrow = `<p class="page-eyebrow">${data.eyebrow}</p>`;
+    const eyebrow = data.eyebrow ? `<p class="page-eyebrow">${data.eyebrow}</p>` : "";
     const titleHtml = `<h1 class="page-title">${data.title}</h1>`;
     main.innerHTML = renderCardsPage(eyebrow, titleHtml, data.cards, key);
   } else if(key === "settings"){
@@ -1152,38 +1101,6 @@ document.addEventListener("keydown", (e) => {
   if(e.key === "Escape"){
     closeSearch();
   }
-});
-
-/* ---------- 우측 하단 퀵메뉴 ---------- */
-function closeQuickPanels(){
-  document.getElementById("recentPanel").classList.remove("open");
-  document.getElementById("feedbackPanel").classList.remove("open");
-}
-
-document.getElementById("qmFab").addEventListener("click", () => {
-  document.getElementById("qmFab").classList.toggle("open");
-  document.getElementById("qmItems").classList.toggle("open");
-});
-
-document.getElementById("qmRecentBtn").addEventListener("click", () => {
-  document.getElementById("qmItems").classList.remove("open");
-  document.getElementById("qmFab").classList.remove("open");
-  document.getElementById("feedbackPanel").classList.remove("open");
-  document.getElementById("recentPanel").classList.toggle("open");
-});
-
-document.getElementById("qmFeedbackBtn").addEventListener("click", () => {
-  document.getElementById("qmItems").classList.remove("open");
-  document.getElementById("qmFab").classList.remove("open");
-  document.getElementById("recentPanel").classList.remove("open");
-  document.getElementById("feedbackPanel").classList.toggle("open");
-});
-
-document.getElementById("recentPanelClose").addEventListener("click", () => {
-  document.getElementById("recentPanel").classList.remove("open");
-});
-document.getElementById("feedbackClose").addEventListener("click", () => {
-  document.getElementById("feedbackPanel").classList.remove("open");
 });
 
 renderPage("stage1");
