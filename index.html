@@ -675,7 +675,7 @@ const AGENT_DATA = {
     {status:"2027", type:"tool", icon:"image", name:"삽화가 디렉토리", bullets:["산그림 삽화가 및 삽화풍 탐색","삽화풍·그림체별 스타일 비교"]}
   ]},
   guide: { eyebrow:"", title:"이용 가이드", cards: [
-    {status:"wip", type:"tool", icon:"icmark", name:"InCopy 사용 가이드", bullets:["주요 기능·설정 방법 제공","자주 발생하는 오류 해결 가이드"]},
+    {status:"wip", type:"tool", icon:"icmark", name:"InCopy 사용 가이드", href:"https://qrd.i-scream.co.kr/nexus/incopy_guide/incopy_guide.html", bullets:["주요 기능·설정 방법 제공","자주 발생하는 오류 해결 가이드"]},
     {status:"2027", type:"tool", icon:"messagecircle", name:"F&Q", bullets:["자주 묻는 질문 리스트","질문 게시판 등록"]}
   ]}
 };
@@ -764,7 +764,7 @@ function renderCardsPage(eyebrow, titleHtml, cards, pageKey, headerClass){
       `<option value="${val}" ${val === progress ? "selected" : ""}>${PROGRESS_META[val]}</option>`
     ).join("");
     return `
-      <div class="card ${disabled ? "disabled" : ""}" data-card-name="${c.name}" data-card-icon="${c.icon}">
+      <div class="card ${disabled ? "disabled" : ""}" data-card-name="${c.name}" data-card-icon="${c.icon}" ${c.href ? `data-card-href="${c.href}"` : ""}>
         <div class="card-top">
           <div class="icon-badge">${icon(c.icon)}</div>
           <p class="card-title">${c.name}</p>
@@ -937,6 +937,7 @@ document.addEventListener("click", (e) => {
     const name = cardEl.dataset.cardName;
     const iconName = cardEl.dataset.cardIcon;
     if(name) recordRecentlyViewed(name, iconName);
+    if(cardEl.dataset.cardHref) window.open(cardEl.dataset.cardHref, "_blank", "noopener,noreferrer");
   }
   const target = e.target.closest("[data-page]");
   if(target) renderPage(target.dataset.page);
