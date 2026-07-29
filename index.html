@@ -204,7 +204,7 @@
     cursor:pointer; overflow:hidden;
     transition:box-shadow .15s ease, transform .15s ease, border-color .15s ease;
   }
-  .card:hover{ box-shadow:0 4px 14px rgba(20,23,28,.10); border-color:#a9aeb6; background-color:#f5f6f7; transform:translateY(-1px); }
+  .card:hover{ box-shadow:0 4px 16px rgba(81,83,208,.20); border-color:#5153d0; transform:translateY(-1px); }
   .card.disabled{ opacity:.85; }
 
   .card-top{ display:flex; gap:12px; align-items:center; }
@@ -667,8 +667,8 @@ const AGENT_DATA = {
     {status:"wip", type:"tool", icon:"refresh", name:"유사 문항 생성기", bullets:["숫자·소재·맥락 변형한 유사 문항 생성","원본 문항 기반 변형 규칙 추출","정답·해설 재생성 및 품질 검증"]},
     {status:"wip", type:"agent", icon:"ox", name:"평가 설계 에이전트", bullets:["평가 문항 난이도 정교화","시험지 세트 적합성 검증","맞춤형 문항 시험지 세트 구성"]},
     {status:"2027", type:"agent", icon:"monitor", name:"자료실 에이전트", bullets:["차시·성취기준 기반 수업 자료 통합 생성","평가문항·지도안·교사용 체크리스트 구성","자기·동료 평가지 및 수업용 PPT 생성"]},
-    {status:"wip", type:"agent", icon:"gamepad", name:"학습 게임 에이전트", progress:"done", bullets:["게임 메커닉 매핑(점수·레벨·미션)","유형별 게임 템플릿 기반 학습 게임 생성","난이도·진행·보상 로직 설정 및 검증"]},
-    {status:"wip", type:"tool", icon:"qrcode", name:"QR·Short URL 생성기", progress:"inprogress", bullets:["콘텐츠 URL의 단축 주소 자동 생성","QR 코드 일괄 생성(포맷·해상도·에러정정 설정)"]}
+    {status:"wip", type:"agent", icon:"gamepad", name:"학습 게임 에이전트", href:"https://qrd.i-scream.co.kr/nexus/stg3-games/index.html", progress:"done", bullets:["게임 메커닉 매핑(점수·레벨·미션)","유형별 게임 템플릿 기반 학습 게임 생성","난이도·진행·보상 로직 설정 및 검증"]},
+    {status:"wip", type:"tool", icon:"qrcode", name:"QR·Short URL 생성기", href:"https://qrd.i-scream.co.kr/nexus/stg3-qrurl/index.html", progress:"inprogress", bullets:["콘텐츠 URL의 단축 주소 자동 생성","QR 코드 일괄 생성(포맷·해상도·에러정정 설정)"]}
   ]},
   stage4: { cards: [
     {status:"wip", type:"agent", icon:"clipboardlist", name:"큐시트 에이전트", bullets:["영상·음원 제작용 큐시트 초안 생성","장면별 내레이션·자막·효과음·화면 구성","촬영·편집 진행을 위한 제작 지시 구조화"]},
@@ -711,7 +711,7 @@ const PLACEHOLDER_PAGES = {
 /* ---------- 사이드바 COMMON/footer nav 렌더 ---------- */
 const COMMON_NAV_ITEMS = [
   { key:"wbs", icon:"calendar", label:"프로젝트 관리", href:"https://qrd.i-scream.co.kr/nexus/comm-wbs/index.html" },
-  { key:"filename", icon:"tag", label:"표준 파일명 생성기", href:"https://qrd.i-scream.co.kr/nexus/comm-filename/index.html" },
+  { key:"filename", icon:"tag", label:"표준 파일명 생성기", href:"https://qrd.i-scream.co.kr/nexus/comm-filename/index_rename.html" },
   { key:"library", icon:"folder", label:"라이브러리" },
   { key:"copyright", icon:"copyright", label:"저작권·출처 에이전트" },
   { key:"meetingArchive", icon:"archive", label:"회의록 아카이브" }
